@@ -3,6 +3,10 @@ import os
 NEWS_API_KEY = os.getenv('NEWS_API_KEY')
 SERPAPI_API_KEY = os.getenv('SERPAPI_API_KEY')
 
+import sys 
+sys.path.append('..')
+from utils import bullet_format
+
 from dotenv import load_dotenv
 
 from langchain.prompts import PromptTemplate
@@ -72,18 +76,13 @@ def main():
     
     if analysis_prompt and when_prompt:
         rise_or_fall = rise_or_fall_agent_chain.run(company=analysis_prompt, when=when_prompt)
+        rise_or_fall = rise_or_fall.replace('$', '')
         st.write(f"### :blue[_Rise or Fall_]:")
         st.write(rise_or_fall)
 
         news = news_agent.run(news_template.format(company=analysis_prompt, when=when_prompt))
 
-        ns = news
-        notes = ns.split("-")
-        tmp = ""
-        for n in notes[1:]:
-            tmp = tmp + "\n•  " + n + "\n"
-        news = tmp
-        #del(tmp)
+        news = bullet_format(news)
 
         st.write(f"### :blue[_News_]:")
         st.write(news)

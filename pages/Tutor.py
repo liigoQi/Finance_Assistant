@@ -3,6 +3,10 @@ import os
 NEWS_API_KEY = os.getenv('NEWS_API_KEY')
 SERPAPI_API_KEY = os.getenv('SERPAPI_API_KEY')
 
+import sys 
+sys.path.append('..')
+from utils import bullet_format
+
 from dotenv import load_dotenv
 
 from langchain.prompts import PromptTemplate
@@ -10,7 +14,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.llms import OpenAI
 from langchain.utilities import WikipediaAPIWrapper
 from langchain.chains import LLMChain
-from langchain.agents import load_tools, AgentExecutor, initialize_agent, AgentType
+
 
 st.set_page_config(page_title="Finance Tutor", page_icon="📖")
 
@@ -68,14 +72,7 @@ def main():
         wiki_research = wiki.run(topic_prompt)
         lecture_notes = lecture_chain.run(finance_topic=finance_topic, wikipedia_research=wiki_research)
 
-        # If the notes have bullet points then it needs to be processed properly before sending to streamlit.write
-        ln = lecture_notes
-        notes = ln.split("•")
-        tmp = ""
-        for note in notes[1:]:
-            tmp = tmp + "\n•  " + note + "\n"
-        lecture_notes = tmp
-        #del(tmp)
+        lecture_notes = bullet_format(lecture_notes)
 
         st.write(f"Topic: :red[{topic_prompt.capitalize()}]")
         st.write(finance_topic)
